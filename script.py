@@ -1,4 +1,4 @@
-from CloudFlare import CloudFlare
+from CloudFlare import cloudflare
 import requests
 
 def get_google_addresses():
