@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"  # placering af requirements.txt
+    schedule:
+      interval: "weekly"  # kan også være "daily" eller "monthly"
+    commit-message:
+      prefix: "deps"
+    allow:
+      - dependency-type: "all"
