@@ -9,7 +9,7 @@ def get_google_addresses():
     return ips
 
 def update_access_group(token, account_id, group_id, ips):
-    cf = cloudflare.Cloudflare(token=token)  # Korrekt brug af CloudFlare SDK
+    cf = cloudflare.Cloudflare(token)  # Korrekt brug af CloudFlare SDK
     
     data = {
         "include": [ {"ip": {"ip": ip}} for ip in ips ],
