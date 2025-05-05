@@ -9,7 +9,7 @@ def get_google_addresses():
     return ips
 
 def update_access_group(token, account_id, group_id, ips):
-    cf = Cloudflare(token=token)
+    cf = Cloudflare(token=token)  # SDK v4.1.0 understøtter dette direkte
 
     data = {
         "include": [{"ip": {"ip": ip}} for ip in ips],
@@ -17,14 +17,14 @@ def update_access_group(token, account_id, group_id, ips):
         "require": []
     }
 
-    cf.zero_trust.access.groups.update(account_id, group_id, data=data)
+    cf.zero_trust.access.groups.update(account_id=account_id, group_id=group_id, data=data)
 
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Cloudflare Google Assistant Access Group updater")
     parser.add_argument("--account", required=True, help="CF account ID")
-    parser.add_argument("--token", required=True, help="CF API key")
-    parser.add_argument("--group", required=True, help="ID of CF Access group that needs to be updated")
+    parser.add_argument("--token", required=True, help="CF API token")
+    parser.add_argument("--group", required=True, help="ID of CF Access group to update")
     args = parser.parse_args()
 
     ips = get_google_addresses()
