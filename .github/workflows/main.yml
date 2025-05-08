@@ -1,4 +1,4 @@
-name: main.py
+name: Cloudflare Access Group Updater
 
 on:
   schedule:
@@ -8,17 +8,16 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment:
-      name: PROD  # Sikrer at secrets fra environmentet bruges korrekt
+    environment: PROD
     steps:
 
       - name: Checkout repo content
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 # Checkout the repository content
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.12' # Install the required Python version
 
       - name: Install Python packages
         run: |
@@ -30,4 +29,5 @@ jobs:
           CF_ACCESSGROUP_ID: ${{ secrets.CF_ACCESSGROUP_ID }}
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
           CF_TOKEN: ${{ secrets.CF_TOKEN }}
+
         run: python script.py
