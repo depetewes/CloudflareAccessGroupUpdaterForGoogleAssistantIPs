@@ -52,7 +52,7 @@ def update_access_group():
     
     data = {
         "name": "Google IP Group", # New name for the group
-        "include": [{"ip": {"ip": ip}} for ip in ips],  # Vi inkluderer IP-adresserne i gruppen
+        "include": [{"ip": {"ip": ip}} for ip in ips],
         "exclude": [],
         "require": []
     }
