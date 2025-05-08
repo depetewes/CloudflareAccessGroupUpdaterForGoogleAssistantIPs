@@ -1,40 +1,41 @@
+import os
 from cloudflare import Cloudflare
 import requests
-import os
 
+# Hent API-token, konto-ID og adgangsgruppe-ID fra miljøvariabler (som defineret i GitHub Actions secrets)
+api_token = os.environ.get("CLOUDFLARE_API_TOKEN", "")
+account_id = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "")
+group_id = os.environ.get("CLOUDFLARE_GROUP_ID", "")  # Den specifikke adgangsgruppe, du vil opdatere
+
+# Hvis nogen af de nødvendige miljøvariabler mangler, stopper scriptet
+if not api_token or not account_id or not group_id:
+    print("API Token, Account ID, and Group ID are required as environment variables.")
+    exit(1)
+
+# Hent Google IP-adresser (Google Assistant IP ranges)
 def get_google_addresses():
     r = requests.get("https://www.gstatic.com/ipranges/goog.json")
-    r.raise_for_status()
+    r.raise_for_status()  # Hvis der er en fejl, stoppes scriptet
     ips = [entry['ipv4Prefix'] for entry in r.json()['prefixes'] if 'ipv4Prefix' in entry]
     ips += [entry['ipv6Prefix'] for entry in r.json()['prefixes'] if 'ipv6Prefix' in entry]
     return ips
 
+# Opdater adgangsgruppen i Cloudflare
 def update_access_group():
-    # Fetch token from environment variable
-    token = os.getenv("CF_TOKEN")
-    if not token:
-        raise ValueError("CF_TOKEN environment variable not set.")
-    
-    # Initialize Cloudflare client using the token
-    cf = Cloudflare(token=token)  # Correct initialization of the client
+    # Initialiser Cloudflare-klienten med API-tokenet
+    cf = Cloudflare.from_token(api_token)
 
-    # Retrieve environment variables for account and group ID
-    account_id = os.getenv("CF_ACCOUNT_ID")
-    group_id = os.getenv("CF_ACCESSGROUP_ID")
-
-    if not account_id or not group_id:
-        raise ValueError("CF_ACCOUNT_ID or CF_ACCESSGROUP_ID environment variables not set.")
-    
+    # Hent IP-adresserne fra Google Assistant
     ips = get_google_addresses()
 
-    # Prepare data to update
+    # Forbered dataen til opdateringen af adgangsgruppen
     data = {
-        "include": [{"ip": {"ip": ip}} for ip in ips],
+        "include": [{"ip": {"ip": ip}} for ip in ips],  # Vi inkluderer IP-adresserne i gruppen
         "exclude": [],
         "require": []
     }
 
-    # Update the access group with new IPs
+    # Opdater adgangsgruppen i Cloudflare
     cf.zero_trust.access.groups.update(group_id, account_id=account_id, **data)
 
 if __name__ == "__main__":
