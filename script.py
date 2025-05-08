@@ -6,7 +6,7 @@ import requests
 
 api_token = os.environ.get("CLOUDFLARE_API_TOKEN", "")
 account_id = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "")
-group_id = os.environ.get("CLOUDFLARE_GROUP_ID", "")  # he specific Cloudflare Access Group you want to update
+group_id = os.environ.get("CLOUDFLARE_GROUP_ID", "")  # the specific Cloudflare Access Group you want to update
 
 # checks for the presence of each variable individually and reports specifically which ones are missing
 
