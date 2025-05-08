@@ -30,7 +30,7 @@ def update_access_group():
 
     # Forbered dataen til opdateringen af adgangsgruppen
     data = {
-        "name": "Google Assistant IP Group", # New name for the group
+        "name": "Google IP Group", # New name for the group
         "include": [{"ip": {"ip": ip}} for ip in ips],  # Vi inkluderer IP-adresserne i gruppen
         "exclude": [],
         "require": []
