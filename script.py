@@ -15,8 +15,8 @@ def update_access_group():
     if not token:
         raise ValueError("CF_TOKEN environment variable not set.")
     
-    # Initialize Cloudflare client
-    cf = Cloudflare(token=token)  # SDK v4.1.0
+    # Initialize Cloudflare client using 'from_token'
+    cf = Cloudflare.from_token(token)  # SDK v4.1.0: use from_token instead of passing token directly
 
     # Retrieve environment variables for account and group ID
     account_id = os.getenv("CF_ACCOUNT_ID")
