@@ -1,33 +1,32 @@
-name: main.py
+name: Update Cloudflare Access Group with Google IPs
 
 on:
   schedule:
-    - cron: '15 */12 * * *'
+    - cron: '15 */12 * * *'  # Kører hver 12. time kl. 15 min over
   workflow_dispatch:
 
 jobs:
-  build:
+  update-access-group:
     runs-on: ubuntu-latest
     environment: PROD
     steps:
 
-      - name: checkout repo content
-        uses: actions/checkout@v4 # checkout the repository content
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      - name: setup python
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12' # install the python version needed
+          python-version: '3.12'
 
-      - name: install python packages
+      - name: Install Python packages
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: execute py script # run main.py
+      - name: Run script to update access group
         env:
           CF_ACCESSGROUP_ID: ${{ secrets.CF_ACCESSGROUP_ID }}
           CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-          CF_TOKEN: ${{ secrets.CF_TOKEN }}
-
-        run: python script.py --account "$CF_ACCOUNT_ID" --token "$CF_TOKEN" --group "$CF_ACCESSGROUP_ID"
+          CF_API_TOKEN: ${{ secrets.CF_TOKEN }}
+        run: python script.py
