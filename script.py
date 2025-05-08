@@ -2,14 +2,24 @@ import os
 from cloudflare import Cloudflare
 import requests
 
-# Hent API-token, konto-ID og adgangsgruppe-ID fra miljøvariabler (som defineret i GitHub Actions secrets)
+# Retrieve API token, account ID, and access group ID from environment variables (as defined in GitHub Actions secrets)
 api_token = os.environ.get("CLOUDFLARE_API_TOKEN", "")
 account_id = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "")
 group_id = os.environ.get("CLOUDFLARE_GROUP_ID", "")  # Den specifikke adgangsgruppe, du vil opdatere
 
-# Hvis nogen af de nødvendige miljøvariabler mangler, stopper scriptet
-if not api_token or not account_id or not group_id:
-    print("API Token, Account ID, and Group ID are required as environment variables.")
+# checks for the presence of each variable individually and reports specifically which ones are missing
+missing = []
+if not api_token:
+    missing.append("API Token")
+if not account_id:
+    missing.append("Account ID")
+if not group_id:
+    missing.append("Group ID")
+
+if missing:
+    print("The following required environment variables are missing:")
+    for variable in missing:
+        print(f"- {variable}")
     exit(1)
 
 # Hent Google IP-adresser (Google Assistant IP ranges)
