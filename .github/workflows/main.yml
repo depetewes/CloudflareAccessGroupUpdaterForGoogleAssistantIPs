@@ -1,4 +1,4 @@
-name: Cloudflare Access Group Updater
+name: main.py
 
 on:
   schedule:
@@ -11,23 +11,22 @@ jobs:
     environment: PROD
     steps:
 
-      - name: Checkout repo content
-        uses: actions/checkout@v4 # Checkout the repository content
+      - name: checkout repo content
+        uses: actions/checkout@v4
 
-      - name: Setup Python
+      - name: setup python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12' # Install the required Python version
+          python-version: '3.12'
 
-      - name: Install Python packages
+      - name: install python packages
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Execute Python script
+      - name: execute py script # run main.py
         env:
-          CF_ACCESSGROUP_ID: ${{ secrets.CF_ACCESSGROUP_ID }}
-          CF_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
-          CF_TOKEN: ${{ secrets.CF_TOKEN }}
-
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CF_ACCOUNT_ID }}
+          CLOUDFLARE_GROUP_ID: ${{ secrets.CF_ACCESSGROUP_ID }}
         run: python script.py
