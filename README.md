@@ -1,4 +1,4 @@
-#testing
+8.5.2025 Updated to Cloudlfare Python SDK 4.1.10
 # CloudflareAccessGroupUpdaterForGoogleAssistantIPs
 Script for automatically updating a [CloudFlare Access group](https://developers.cloudflare.com/cloudflare-one/identity/users/groups/) to include all the IP addresses used by Google Assistant.
 
