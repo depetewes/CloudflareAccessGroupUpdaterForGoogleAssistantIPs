@@ -23,7 +23,7 @@ def get_google_addresses():
 # Opdater adgangsgruppen i Cloudflare
 def update_access_group():
     # Initialiser Cloudflare-klienten med API-tokenet
-    cf = Cloudflare.from_token(api_token)
+    cf = Cloudflare() # read secrets from variebles
 
     # Hent IP-adresserne fra Google Assistant
     ips = get_google_addresses()
