@@ -1,33 +1,68 @@
-import CloudFlare
+import os
+from cloudflare import Cloudflare
 import requests
+
+# Retrieve API token, account ID, and access group ID from environment variables (as defined in GitHub Actions secrets)
+
+api_token = os.environ.get("CLOUDFLARE_API_TOKEN", "")
+account_id = os.environ.get("CLOUDFLARE_ACCOUNT_ID", "")
+group_id = os.environ.get("CLOUDFLARE_GROUP_ID", "")  # the specific Cloudflare Access Group you want to update
+
+# checks for the presence of each variable individually and reports specifically which ones are missing
+
+missing = []
+if not api_token:
+    missing.append("API Token")
+if not account_id:
+    missing.append("Account ID")
+if not group_id:
+    missing.append("Group ID")
+
+if missing:
+    print("The following required environment variables are missing:")
+    for variable in missing:
+        print(f"- {variable}")
+    exit(1)
+
+# This function retrieves a list of Google's IPv4 and IPv6 address ranges
+# by fetching and parsing the JSON data from Google's public IP range file.
+# It handles potential HTTP errors by raising an exception, which will stop the script.
 
 def get_google_addresses():
     r = requests.get("https://www.gstatic.com/ipranges/goog.json")
-    r.raise_for_status()
-    ips = [ entry['ipv4Prefix'] for entry in r.json()['prefixes'] if 'ipv4Prefix' in entry ]
-    ips = ips + [ entry['ipv6Prefix'] for entry in r.json()['prefixes'] if 'ipv6Prefix' in entry ]
+    r.raise_for_status()  # If there is an error, the script will stop
+    ips = [entry['ipv4Prefix'] for entry in r.json()['prefixes'] if 'ipv4Prefix' in entry]
+    ips += [entry['ipv6Prefix'] for entry in r.json()['prefixes'] if 'ipv6Prefix' in entry]
     return ips
+
+# Update access group in Zero Trust - Cloudflare
+
+def update_access_group():
+    # Initialize Cloudflare client with secrets
+    cf = Cloudflare() # read secrets from variebles
+
+# Get Google IP addresses
     
-def update_access_group(token, account_id, group_id, ips):
-    cf = CloudFlare.CloudFlare(token=token)
+    ips = get_google_addresses()
+
+# This dictionary defines the data structure for creating or updating an IP Group,
+# specifically for Google's IP addresses. It sets the group's name and includes
+# a list of IP address objects derived from a previously obtained list ('ips').
+# Exclusion and requirement lists are currently empty.
     
     data = {
-        "include": [ {"ip": {"ip": ip}} for ip in ips ],
+        "name": "Google IP Group", # New name for the group
+        "include": [{"ip": {"ip": ip}} for ip in ips],
         "exclude": [],
         "require": []
     }
-    
-    cf.accounts.access.groups.put(account_id, group_id, data=data)
-    
-if __name__ == "__main__":
-    import argparse
-    
-    parser = argparse.ArgumentParser(description = "CloudFlare Google Assistant Access Group updater")
-    parser.add_argument("--account", required=True, help="CF account ID")
-    parser.add_argument("--token",   required=True, help="CF API key")
-    parser.add_argument("--group",   required=True, help="ID of CF Access group that needs to be updated")
-    args = parser.parse_args()
 
-    ips = get_google_addresses()
-    update_access_group(args.token, args.account, args.group, ips)
-  
+# Updates an existing Cloudflare Access Group with the specified group ID,
+# applying the provided data (which likely includes the group's name and included IP addresses)
+# within the context of the given Cloudflare account ID.
+    cf.zero_trust.access.groups.update(group_id, account_id=account_id, **data)
+
+# Ensures that the 'update_access_group' function is called
+
+if __name__ == "__main__":
+    update_access_group()
